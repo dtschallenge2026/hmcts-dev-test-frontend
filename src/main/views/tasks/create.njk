@@ -1,0 +1,58 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% extends "template.njk" %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Create a new task</h1>
+
+  {% if error %}
+    <p class="govuk-error-message">{{ error }}</p>
+  {% endif %}
+
+  <form method="post" action="/tasks">
+    {{ govukInput({
+      label: { text: "Title", classes: "govuk-label--m" },
+      id: "title",
+      name: "title"
+    }) }}
+
+    {{ govukTextarea({
+      label: {
+        text: "Description",
+        classes: "govuk-label--m"
+      },
+      hint: { text: "Optional" },
+      id: "description",
+      name: "description"
+    }) }}
+
+    {{ govukSelect({
+      label: { text: "Status", classes: "govuk-label--m" },
+      id: "status",
+      name: "status",
+      items: [
+        { value: "TODO", text: "To do" },
+        { value: "IN_PROGRESS", text: "In progress" },
+        { value: "DONE", text: "Done" }
+      ]
+    }) }}
+
+    {{ govukInput({
+      label: { text: "Due date and time", classes: "govuk-label--m" },
+      id: "dueDateTime",
+      name: "dueDateTime",
+      type: "datetime-local"
+    }) }}
+
+    {{ govukButton({
+      text: "Create task"
+    }) }}
+  </form>
+
+  <p class="govuk-body">
+    <a class="govuk-link" href="/tasks">Back to tasks</a>
+  </p>
+{% endblock %}

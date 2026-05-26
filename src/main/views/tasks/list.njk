@@ -1,0 +1,45 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% extends "template.njk" %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Tasks</h1>
+
+  {{ govukButton({
+    text: "Create new task",
+    href: "/tasks/new"
+  }) }}
+
+  {% if tasks.length %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header">Title</th>
+          <th class="govuk-table__header">Status</th>
+          <th class="govuk-table__header">Due date/time</th>
+          <th class="govuk-table__header">Action</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for task in tasks %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <a class="govuk-link" href="/tasks/{{ task.id }}">{{ task.title }}</a>
+            </td>
+            <td class="govuk-table__cell">{{ task.status }}</td>
+            <td class="govuk-table__cell">{{ task.dueDateTime }}</td>
+            <td class="govuk-table__cell">
+              <form method="post" action="/tasks/{{ task.id }}/delete">
+                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">
+                  Delete
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="govuk-body">No tasks found.</p>
+  {% endif %}
+{% endblock %}

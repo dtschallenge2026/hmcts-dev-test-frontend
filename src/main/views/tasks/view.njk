@@ -1,0 +1,44 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% extends "template.njk" %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">{{ task.title }}</h1>
+
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: { text: "Title" },
+        value: { text: task.title }
+      },
+      {
+        key: { text: "Description" },
+        value: { text: task.description if task.description else "None" }
+      },
+      {
+        key: { text: "Status" },
+        value: { text: task.status }
+      },
+      {
+        key: { text: "Due date/time" },
+        value: { text: task.dueDateTime }
+      }
+    ]
+  }) }}
+
+  {{ govukButton({
+    text: "Update status",
+    href: "/tasks/" + task.id + "/edit-status"
+  }) }}
+
+  <form method="post" action="/tasks/{{ task.id }}/delete">
+    <button class="govuk-button govuk-button--warning" data-module="govuk-button">
+      Delete task
+    </button>
+  </form>
+
+  <p class="govuk-body">
+    <a class="govuk-link" href="/tasks">Back to tasks</a>
+  </p>
+{% endblock %}

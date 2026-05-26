@@ -1,0 +1,46 @@
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% extends "template.njk" %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">Update status</h1>
+  <p class="govuk-body">Task: <strong>{{ task.title }}</strong></p>
+
+  <form method="post" action="/tasks/{{ task.id }}/edit-status">
+    {{ govukRadios({
+      name: "status",
+      fieldset: {
+        legend: {
+          text: "Select a status",
+          classes: "govuk-fieldset__legend--m"
+        }
+      },
+      items: [
+        {
+          value: "TODO",
+          text: "To do",
+          checked: task.status == "TODO"
+        },
+        {
+          value: "IN_PROGRESS",
+          text: "In progress",
+          checked: task.status == "IN_PROGRESS"
+        },
+        {
+          value: "DONE",
+          text: "Done",
+          checked: task.status == "DONE"
+        }
+      ]
+    }) }}
+
+    {{ govukButton({
+      text: "Update status"
+    }) }}
+  </form>
+
+  <p class="govuk-body">
+    <a class="govuk-link" href="/tasks/{{ task.id }}">Back to task</a>
+  </p>
+{% endblock %}
