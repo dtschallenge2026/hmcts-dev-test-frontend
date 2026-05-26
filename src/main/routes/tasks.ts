@@ -34,7 +34,11 @@ export default function (app: Application): void {
       res.render('tasks/view', { task: response.data });
     } catch (error) {
       console.error('Error fetching task:', error);
-      res.redirect('/tasks');
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        res.status(404).render('tasks/not-found');
+      } else {
+        res.redirect('/tasks');
+      }
     }
   });
 
