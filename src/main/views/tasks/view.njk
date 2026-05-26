@@ -1,10 +1,27 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
 
 {% extends "template.njk" %}
 
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back to tasks",
+    href: "/tasks"
+  }) }}
+{% endblock %}
+
 {% block content %}
   <h1 class="govuk-heading-xl">{{ task.title }}</h1>
+
+  {% if task.status == "TODO" %}
+    {% set statusHtml %}{{ govukTag({ text: "To do", classes: "govuk-tag--grey" }) }}{% endset %}
+  {% elif task.status == "IN_PROGRESS" %}
+    {% set statusHtml %}{{ govukTag({ text: "In progress" }) }}{% endset %}
+  {% else %}
+    {% set statusHtml %}{{ govukTag({ text: "Done", classes: "govuk-tag--green" }) }}{% endset %}
+  {% endif %}
 
   {{ govukSummaryList({
     rows: [
@@ -18,7 +35,7 @@
       },
       {
         key: { text: "Status" },
-        value: { text: task.status }
+        value: { html: statusHtml }
       },
       {
         key: { text: "Due date/time" },
@@ -33,12 +50,9 @@
   }) }}
 
   <form method="post" action="/tasks/{{ task.id }}/delete">
-    <button class="govuk-button govuk-button--warning" data-module="govuk-button">
-      Delete task
-    </button>
+    {{ govukButton({
+      text: "Delete task",
+      classes: "govuk-button--warning"
+    }) }}
   </form>
-
-  <p class="govuk-body">
-    <a class="govuk-link" href="/tasks">Back to tasks</a>
-  </p>
 {% endblock %}

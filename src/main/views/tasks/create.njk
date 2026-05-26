@@ -2,14 +2,28 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% extends "template.njk" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back to tasks",
+    href: "/tasks"
+  }) }}
+{% endblock %}
 
 {% block content %}
   <h1 class="govuk-heading-xl">Create a new task</h1>
 
   {% if error %}
-    <p class="govuk-error-message">{{ error }}</p>
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [
+        { text: error }
+      ]
+    }) }}
   {% endif %}
 
   <form method="post" action="/tasks">
@@ -20,10 +34,7 @@
     }) }}
 
     {{ govukTextarea({
-      label: {
-        text: "Description",
-        classes: "govuk-label--m"
-      },
+      label: { text: "Description", classes: "govuk-label--m" },
       hint: { text: "Optional" },
       id: "description",
       name: "description"
@@ -51,8 +62,4 @@
       text: "Create task"
     }) }}
   </form>
-
-  <p class="govuk-body">
-    <a class="govuk-link" href="/tasks">Back to tasks</a>
-  </p>
 {% endblock %}

@@ -1,4 +1,5 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
 
 {% extends "template.njk" %}
 
@@ -26,13 +27,22 @@
             <td class="govuk-table__cell">
               <a class="govuk-link" href="/tasks/{{ task.id }}">{{ task.title }}</a>
             </td>
-            <td class="govuk-table__cell">{{ task.status }}</td>
+            <td class="govuk-table__cell">
+              {% if task.status == "TODO" %}
+                {{ govukTag({ text: "To do", classes: "govuk-tag--grey" }) }}
+              {% elif task.status == "IN_PROGRESS" %}
+                {{ govukTag({ text: "In progress" }) }}
+              {% elif task.status == "DONE" %}
+                {{ govukTag({ text: "Done", classes: "govuk-tag--green" }) }}
+              {% endif %}
+            </td>
             <td class="govuk-table__cell">{{ task.dueDateTime }}</td>
             <td class="govuk-table__cell">
               <form method="post" action="/tasks/{{ task.id }}/delete">
-                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">
-                  Delete
-                </button>
+                {{ govukButton({
+                  text: "Delete",
+                  classes: "govuk-button--warning govuk-!-margin-bottom-0"
+                }) }}
               </form>
             </td>
           </tr>
