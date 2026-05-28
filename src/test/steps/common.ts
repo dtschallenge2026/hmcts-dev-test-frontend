@@ -1,3 +1,5 @@
+/// <reference types='codeceptjs' />
+/// <reference path='../functional/steps.d.ts' />
 import { config as testConfig } from '../config';
 
 const { I } = inject();
@@ -17,4 +19,12 @@ Then('the page URL should be {string}', (url: string) => {
 
 Then('the page should include {string}', (text: string) => {
   I.waitForText(text);
+});
+
+When('I fill in the field {string} with {string}', (name: string, value: string) => {
+  I.fillField(`[name="${name}"]`, value);
+});
+
+When('I click the button {string}', (text: string) => {
+  I.click(text);
 });

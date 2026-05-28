@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noUnusedLocals": false,
+    "baseUrl": ".",
+    "ts-node": {
+      "transpileOnly": true
+    }
+  },
+  "include": [
+    "src/test/steps/**/*",
+    "src/test/functional/**/*",
+    "src/test/config.ts",
+    "codecept.conf.ts"
+  ]
+}

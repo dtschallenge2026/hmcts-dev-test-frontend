@@ -1,3 +1,4 @@
+/// <reference types="codeceptjs" />
 import { config as testConfig } from './src/test/config';
 
 const { setHeadlessWhen } = require('@codeceptjs/configure');
