@@ -47,16 +47,68 @@ describe('Tasks page', () => {
   });
 
   describe('on POST /tasks', () => {
+    const validTaskForm = {
+      title: 'Test task',
+      status: 'TODO',
+      'due-day': '1',
+      'due-month': '6',
+      'due-year': '2026',
+      'due-hour': '10',
+      'due-minute': '0',
+    };
+
     test('should redirect to task list after successful creation', async () => {
       nock(backendUrl).post('/tasks').reply(201, sampleTask);
 
       await request(app)
         .post('/tasks')
-        .send({ title: 'Test task', status: 'TODO', dueDateTime: '2026-06-01T10:00:00' })
+        .send(validTaskForm)
         .expect(res => {
           expect(res.status).to.equal(302);
           expect(res.headers.location).to.equal('/tasks');
         });
+    });
+
+    test('should assemble dueDateTime correctly from separate date and time fields', async () => {
+      let capturedBody!: Record<string, string>;
+      nock(backendUrl)
+        .post('/tasks', body => { capturedBody = body; return true; })
+        .reply(201, sampleTask);
+
+      await request(app)
+        .post('/tasks')
+        .send({ ...validTaskForm, 'due-day': '5', 'due-month': '6', 'due-year': '2026', 'due-hour': '9', 'due-minute': '0' })
+        .expect(res => expect(res.status).to.equal(302));
+
+      expect(capturedBody.dueDateTime).to.equal('2026-06-05T09:00:00');
+    });
+
+    test('should re-render form when date fields contain text instead of numbers', async () => {
+      await request(app)
+        .post('/tasks')
+        .send({ ...validTaskForm, 'due-day': 'abc', 'due-month': 'xyz', 'due-hour': 'ten' })
+        .expect(res => expect(res.status).to.equal(200));
+    });
+
+    test('should re-render form when day does not exist in the given month', async () => {
+      await request(app)
+        .post('/tasks')
+        .send({ ...validTaskForm, 'due-day': '31', 'due-month': '6' })
+        .expect(res => expect(res.status).to.equal(200));
+    });
+
+    test('should re-render form when day is out of range', async () => {
+      await request(app)
+        .post('/tasks')
+        .send({ ...validTaskForm, 'due-day': '32' })
+        .expect(res => expect(res.status).to.equal(200));
+    });
+
+    test('should re-render form when hour is out of range', async () => {
+      await request(app)
+        .post('/tasks')
+        .send({ ...validTaskForm, 'due-hour': '24' })
+        .expect(res => expect(res.status).to.equal(200));
     });
 
     test('should render create form with error when backend call fails', async () => {
@@ -64,7 +116,7 @@ describe('Tasks page', () => {
 
       await request(app)
         .post('/tasks')
-        .send({ title: '' })
+        .send(validTaskForm)
         .expect(res => expect(res.status).to.equal(200));
     });
   });

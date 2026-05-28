@@ -4,6 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
 {% extends "template.njk" %}
 
@@ -17,12 +18,10 @@
 {% block content %}
   <h1 class="govuk-heading-xl">Create a new task</h1>
 
-  {% if error %}
+  {% if errors %}
     {{ govukErrorSummary({
       titleText: "There is a problem",
-      errorList: [
-        { text: error }
-      ]
+      errorList: errors
     }) }}
   {% endif %}
 
@@ -30,14 +29,16 @@
     {{ govukInput({
       label: { text: "Title", classes: "govuk-label--m" },
       id: "title",
-      name: "title"
+      name: "title",
+      value: values.title if values else ""
     }) }}
 
     {{ govukTextarea({
       label: { text: "Description", classes: "govuk-label--m" },
       hint: { text: "Optional" },
       id: "description",
-      name: "description"
+      name: "description",
+      value: values.description if values else ""
     }) }}
 
     {{ govukSelect({
@@ -45,18 +46,49 @@
       id: "status",
       name: "status",
       items: [
-        { value: "TODO", text: "To do" },
-        { value: "IN_PROGRESS", text: "In progress" },
-        { value: "DONE", text: "Done" }
+        { value: "TODO", text: "To do", selected: values.status == "TODO" if values else false },
+        { value: "IN_PROGRESS", text: "In progress", selected: values.status == "IN_PROGRESS" if values else false },
+        { value: "DONE", text: "Done", selected: values.status == "DONE" if values else false }
       ]
     }) }}
 
-    {{ govukInput({
-      label: { text: "Due date and time", classes: "govuk-label--m" },
-      id: "dueDateTime",
-      name: "dueDateTime",
-      type: "datetime-local"
+    {{ govukDateInput({
+      id: "due",
+      namePrefix: "due",
+      fieldset: {
+        legend: {
+          text: "Due date",
+          classes: "govuk-fieldset__legend--m"
+        }
+      },
+      hint: { text: "For example, 5 6 2026" },
+      items: [
+        { name: "day", value: values["due-day"] if values else "" },
+        { name: "month", value: values["due-month"] if values else "" },
+        { name: "year", value: values["due-year"] if values else "", classes: "govuk-input--width-4" }
+      ]
     }) }}
+
+    <div class="govuk-form-group">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Due time</legend>
+        <div class="govuk-hint">Use 24-hour format. For example, 09 00 or 14 30</div>
+        <div class="govuk-date-input">
+          <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+              <label class="govuk-label govuk-date-input__label" for="due-hour">Hour</label>
+              <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="due-hour" name="due-hour" type="text" inputmode="numeric" value="{{ values['due-hour'] if values else '' }}">
+            </div>
+          </div>
+          <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+              <label class="govuk-label govuk-date-input__label" for="due-minute">Minute</label>
+              <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="due-minute" name="due-minute" type="text" inputmode="numeric" value="{{ values['due-minute'] if values else '' }}">
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </div>
 
     {{ govukButton({
       text: "Create task"
