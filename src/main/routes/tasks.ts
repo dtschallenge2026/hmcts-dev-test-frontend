@@ -1,7 +1,7 @@
 import { Application } from 'express';
 import axios from 'axios';
 
-const backendUrl = 'http://localhost:4000';
+const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
 
 export default function (app: Application): void {
   app.get('/tasks', async (req, res) => {

@@ -1,0 +1,7 @@
+services:
+  frontend:
+    build: .
+    ports:
+      - "3100:3100"
+    environment:
+      BACKEND_URL: http://host.docker.internal:4000
