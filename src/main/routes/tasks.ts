@@ -19,12 +19,42 @@ export default function (app: Application): void {
   });
 
   app.post('/tasks', async (req, res) => {
+    const errors: { text: string }[] = [];
+
+    const day = parseInt(req.body['due-day'], 10);
+    const month = parseInt(req.body['due-month'], 10);
+    const year = parseInt(req.body['due-year'], 10);
+    const hour = parseInt(req.body['due-hour'], 10);
+    const minute = parseInt(req.body['due-minute'], 10);
+
+    if (!req.body['due-day'] || isNaN(day) || day < 1 || day > 31) errors.push({ text: 'Enter a valid day' });
+    if (!req.body['due-month'] || isNaN(month) || month < 1 || month > 12) errors.push({ text: 'Enter a valid month' });
+    if (!req.body['due-year'] || isNaN(year) || String(year).length !== 4) errors.push({ text: 'Enter a valid 4-digit year' });
+    if (!req.body['due-hour'] || isNaN(hour) || hour < 0 || hour > 23) errors.push({ text: 'Enter a valid hour between 0 and 23' });
+    if (!req.body['due-minute'] || isNaN(minute) || minute < 0 || minute > 59) errors.push({ text: 'Enter a valid minute between 0 and 59' });
+
+    if (errors.length === 0) {
+      const parsed = new Date(year, month - 1, day);
+      if (parsed.getMonth() !== month - 1) errors.push({ text: 'The day does not exist in that month' });
+    }
+
+    if (errors.length > 0) {
+      return res.render('tasks/create', { errors, values: req.body });
+    }
+
     try {
-      await axios.post(`${backendUrl}/tasks`, req.body);
+      const dueDateTime = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00`;
+
+      await axios.post(`${backendUrl}/tasks`, {
+        title: req.body.title,
+        description: req.body.description,
+        status: req.body.status,
+        dueDateTime,
+      });
       res.redirect('/tasks');
     } catch (error) {
       console.error('Error creating task:', error);
-      res.render('tasks/create', { error: 'Failed to create task' });
+      res.render('tasks/create', { errors: [{ text: 'Failed to create task. Please try again.' }], values: req.body });
     }
   });
 
