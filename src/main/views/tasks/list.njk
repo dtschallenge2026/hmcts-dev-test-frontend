@@ -36,7 +36,7 @@
                 {{ govukTag({ text: "Done", classes: "govuk-tag--green" }) }}
               {% endif %}
             </td>
-            <td class="govuk-table__cell">{{ task.dueDateTime }}</td>
+            <td class="govuk-table__cell">{{ task.dueDateTime | formatDate }}</td>
             <td class="govuk-table__cell">
               <form method="post" action="/tasks/{{ task.id }}/delete">
                 {{ govukButton({
